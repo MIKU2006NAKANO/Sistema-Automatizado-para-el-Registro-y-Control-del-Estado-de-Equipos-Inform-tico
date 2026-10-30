@@ -1,0 +1,85 @@
+classDiagram
+class EquipmentInput {
+ <<tipoTypeScript>>
+ name: string
+ serial: string
+ inventory: string
+ brand: string
+ model: string
+ location: string
+ processor: string
+ ram: number
+ storage_type: enum
+ storage_gb: number
+ os: string
+ architecture: enum
+ status: Status
+ observations: string
+}
+class Equipment {
+ <<tipoTypeScript>>
+ id: string
+ code: string
+ created_at: string
+ updated_at: string
+}
+Equipment --|> EquipmentInput : interseccion de tipos
+class Profile {
+ <<tipoTypeScript>>
+ id: string
+ full_name: string
+ role: enum
+}
+class History {
+ <<tipoTypeScript>>
+ id: string
+ equipment_id: string
+ previous_status: Status_nullable
+ new_status: Status
+ changed_at: string
+ actor_name: string
+ reason: string
+}
+class Store {
+ <<objetoDevueltoPorFactory>>
+ db: DatabaseSync
+ filename: string
+ list()
+ get(id)
+ save(user,id,raw,reason,expected)
+ remove(user,id,expected)
+ history(id)
+ login(email,password)
+ createUser(raw,bootstrap,actor)
+ session(user)
+ userForToken(token)
+ logout(token)
+ changePassword(user,current,password)
+ assignRole(actor,id,role,expectedRole)
+ createBackup()
+ close()
+}
+class AppError {
+ <<claseReal>>
+ status: number
+ constructor(status,message)
+}
+class Error
+AppError --|> Error
+class ScreenPeer {
+ <<claseRealComplementaria>>
+ connection: RTCPeerConnection
+ pending: RTCIceCandidateInit[]
+ chain: Promise
+ closed: boolean
+ offer(stream)
+ receive(message)
+ close()
+}
+Store ..> Equipment : devuelve
+Store ..> Profile : autentica
+Store ..> History : consulta
+Store ..> AppError : lanza
+note for Store "Abstracción UML de createStore, no clase real"
+note for ScreenPeer "Código presente de supervisión; no habilitado en navegación normal"
+

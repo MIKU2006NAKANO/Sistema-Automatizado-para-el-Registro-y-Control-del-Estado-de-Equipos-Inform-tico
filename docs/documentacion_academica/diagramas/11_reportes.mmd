@@ -1,0 +1,20 @@
+sequenceDiagram
+ actor Administrador
+ participant UI as App / Reports
+ participant API as Express
+ participant F as reportDataset
+ participant E as PDF o ExcelJS
+ UI->>API: GET /api/equipment con sesión
+ API-->>UI: Inventario real
+ Administrador->>UI: Período, texto, estado y tipo PDF
+ UI->>F: Filtra created_at y criterios
+ F-->>UI: Selección, contexto o error
+ alt Selección válida no vacía
+  Administrador->>UI: Exportar
+  UI->>E: Importación dinámica y registros seleccionados
+  E-->>Administrador: Descarga PDF o XLSX local
+ else Inválida o vacía
+  UI-->>Administrador: Mensaje, exportación desactivada
+ end
+ Note over UI,E: No existe endpoint de generación de reportes
+

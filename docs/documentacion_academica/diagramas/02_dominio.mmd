@@ -1,0 +1,41 @@
+classDiagram
+class Equipo {
+ identificacion
+ fichaTecnica
+ ubicacion
+ estadoActual
+ observaciones
+}
+class Usuario {
+ identificadorDeAcceso
+ nombre
+ rol
+}
+class CambioDeEstado {
+ estadoAnterior
+ estadoNuevo
+ momento
+ motivo
+ responsableRegistrado
+}
+class SesionDeAcceso {
+ vencimiento
+}
+class Estado {
+ <<enumeracion>>
+ Funcional
+ ConFallas
+ EnMantenimiento
+}
+class Reporte {
+ <<resultadoDerivado>>
+ seleccion
+ formato
+}
+Usuario "1" -- "0..*" SesionDeAcceso : mantiene
+Equipo "1" -- "0..*" CambioDeEstado : conserva
+Usuario "0..1" -- "0..*" CambioDeEstado : realiza
+Equipo --> Estado : adopta
+Reporte ..> Equipo : resume o lista
+note for Reporte "Concepto derivado: no es tabla ni clase implementada"
+

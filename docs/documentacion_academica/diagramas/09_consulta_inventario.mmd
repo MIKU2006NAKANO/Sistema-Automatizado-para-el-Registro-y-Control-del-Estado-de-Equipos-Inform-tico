@@ -1,0 +1,16 @@
+sequenceDiagram
+ actor Usuario
+ participant UI as App / EquipmentList
+ participant API as Express
+ participant Store
+ participant DB as SQLite
+ Usuario->>UI: Abre inventario
+ UI->>API: GET /api/equipment y /api/health
+ API->>API: Comprueba cookie en consulta de equipos
+ API->>Store: list()
+ Store->>DB: SELECT ORDER BY updated_at DESC,code
+ DB-->>UI: Registros mediante API
+ UI->>UI: Búsqueda, filtros, orden y paginación local
+ UI-->>Usuario: Tabla
+ Note over UI,API: Recarga cada cinco segundos si la página está visible
+

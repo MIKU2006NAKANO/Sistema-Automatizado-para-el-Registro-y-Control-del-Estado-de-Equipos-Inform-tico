@@ -1,0 +1,79 @@
+erDiagram
+ code_counter {
+  INTEGER id PK
+  INTEGER value
+ }
+ equipment {
+  TEXT id PK
+  TEXT code
+  TEXT name
+  TEXT serial
+  TEXT inventory
+  TEXT brand
+  TEXT model
+  TEXT location
+  TEXT processor
+  INTEGER ram
+  TEXT storage_type
+  INTEGER storage_gb
+  TEXT os
+  TEXT architecture
+  TEXT status
+  TEXT observations
+  TEXT created_at
+  TEXT updated_at
+ }
+ sessions {
+  TEXT token_hash PK
+  TEXT user_id FK
+  INTEGER expires_at
+ }
+ status_history {
+  TEXT id PK
+  TEXT equipment_id FK
+  TEXT previous_status
+  TEXT new_status
+  TEXT changed_at
+  TEXT actor_id FK
+  TEXT actor_name
+  TEXT reason
+ }
+ supervision_devices {
+  TEXT id PK
+  TEXT equipment_id FK
+  TEXT token_hash
+  INTEGER expires_at
+ }
+ supervision_pair_codes {
+  TEXT code_hash PK
+  TEXT equipment_id FK
+  INTEGER expires_at
+ }
+ supervision_sessions {
+  TEXT id PK
+  TEXT equipment_id FK
+  TEXT equipment_code
+  TEXT administrator_id FK
+  TEXT administrator_name
+  TEXT requested_at
+  TEXT consented_at
+  TEXT ended_at
+  TEXT state
+  TEXT end_reason
+ }
+ users {
+  TEXT id PK
+  TEXT email
+  TEXT full_name
+  TEXT password_hash
+  TEXT role
+  TEXT created_at
+ }
+ users ||--o{ sessions : autentica
+ equipment ||--o{ status_history : registra
+ users o|--o{ status_history : autor
+ equipment ||--o| supervision_devices : vincula
+ equipment ||--o| supervision_pair_codes : codigo
+ equipment o|--o{ supervision_sessions : referencia
+ users o|--o{ supervision_sessions : administra
+

@@ -1,0 +1,39 @@
+@startuml
+left to right direction
+actor "Usuario autenticado" as U
+actor Administrador as A
+actor "Técnico" as T
+A --|> U
+T --|> U
+rectangle "TechControl ITERN - operación local" {
+ usecase "Iniciar sesión" as Login
+ usecase "Cerrar sesión" as Logout
+ usecase "Consultar / buscar inventario" as List
+ usecase "Consultar ficha e historial" as Hist
+ usecase "Actualizar estado y observaciones" as State
+ usecase "Registrar equipo" as Add
+ usecase "Editar ficha técnica" as Edit
+ usecase "Eliminar equipo" as Del
+ usecase "Exportar PDF / Excel" as Report
+ usecase "Consultar / crear usuarios" as Users
+ usecase "Cambiar rol (solo API)" as Role
+ usecase "Crear / descargar respaldo (API)" as Backup
+ usecase "Cambiar contraseña (solo API)" as Pass
+}
+U --> Login
+U --> Logout
+U --> List
+U --> Hist
+U --> State
+U --> Pass
+A --> Add
+A --> Edit
+A --> Del
+A --> Report
+A --> Users
+A --> Role
+A --> Backup
+note bottom of Pass
+ Configuración existe en código pero no está en Routes.
+end note
+@enduml

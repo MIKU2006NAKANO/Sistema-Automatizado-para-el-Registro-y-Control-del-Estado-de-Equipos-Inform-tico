@@ -1,0 +1,22 @@
+sequenceDiagram
+ actor Usuario
+ participant UI as EquipmentForm
+ participant API as Express
+ participant Store
+ participant DB as SQLite
+ Usuario->>UI: Cambia estado, observaciones y motivo
+ UI->>API: PUT equipo + expected_updated_at
+ API->>Store: save(user,id,data,reason,expected)
+ Store->>Store: Técnico: solo estado y observaciones
+ Store->>DB: BEGIN IMMEDIATE y SELECT anterior
+ alt Versión no coincide
+  Store->>DB: ROLLBACK
+  API-->>UI: 409 conflicto
+ else Versión coincide y motivo válido
+  Store->>DB: UPDATE equipo
+  Store->>DB: INSERT historial si cambió estado
+  Store->>DB: COMMIT
+  API-->>UI: Equipo actualizado
+  UI->>API: Recarga inventario e historial
+ end
+

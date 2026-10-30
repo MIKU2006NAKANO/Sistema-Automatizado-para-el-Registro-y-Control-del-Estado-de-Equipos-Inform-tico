@@ -1,0 +1,17 @@
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { date, statistics, type Equipment } from '../domain';
+export function createPDF(items: Equipment[], title = 'Listado de computadoras', individual = false, summary = false, context = '') {
+  const doc = new jsPDF({ orientation: individual ? 'portrait' : 'landscape' });
+  doc.setFontSize(22); doc.setTextColor(28, 62, 110); doc.text('TechControl ITERN', 14, 20);
+  doc.setFontSize(11); doc.text(title, 14, 29); doc.setTextColor(100); doc.text(`Generado: ${date(new Date().toISOString())}`, 14, 37);
+  const lines=context?doc.splitTextToSize(context,doc.internal.pageSize.width-28):[];if(lines.length){doc.setFontSize(9);doc.text(lines,14,45);}const startY=lines.length?50+lines.length*4:44;
+  if (individual && items[0]) { const e = items[0]; autoTable(doc, { startY, head: [['Campo', 'Información']], body: [['Código', e.code], ['Nombre', e.name], ['Serie', e.serial], ['Inventario', e.inventory], ['Marca / modelo', `${e.brand} ${e.model}`], ['Ubicación', e.location], ['Procesador', e.processor], ['RAM', `${e.ram} GB`], ['Almacenamiento', `${e.storage_type} · ${e.storage_gb} GB`], ['Sistema operativo', e.os], ['Arquitectura', e.architecture], ['Estado', e.status], ['Observaciones', e.observations], ['Registro', date(e.created_at)], ['Actualización', date(e.updated_at)]] }); }
+  else if (summary) { const s = statistics(items); autoTable(doc, { startY, head: [['Indicador', 'Valor']], body: [['Equipos seleccionados', String(s.total)], ['Funcionales', String(s.functional)], ['Con fallas', String(s.faulty)], ['En mantenimiento', String(s.maintenance)], ['Porcentaje funcional', `${s.percentage}%`], ['Capacidad del laboratorio', '30']] }); }
+  else autoTable(doc, { startY, head: [['Código', 'Equipo', 'Serie', 'Inventario', 'Ubicación', 'Estado']], body: items.map(e => [e.code, `${e.name}\n${e.brand} ${e.model}`, e.serial, e.inventory, e.location, e.status]), styles: { fontSize: 9 }, headStyles: { fillColor: [30, 64, 115] } });
+  for (let n = 1; n <= doc.getNumberOfPages(); n++) { doc.setPage(n); doc.setFontSize(8); doc.text(`TechControl ITERN · Página ${n} de ${doc.getNumberOfPages()}`, 14, doc.internal.pageSize.height - 10); }
+  return doc;
+}
+export function exportPDF(items: Equipment[], title = 'Listado de computadoras', individual = false, summary = false, context = '') { createPDF(items,title,individual,summary,context).save(`techcontrol-${individual ? items[0]?.code : 'reporte'}-${new Date().toISOString().slice(0,10)}.pdf`); }
+export function csvContent(items: Equipment[]) { const escape = (v: unknown) => `"${String(v ?? '').replace(/^[=+@\-\t\r]/, "'$&").replaceAll('"', '""')}"`; return '\uFEFF' + [['Código','Nombre','Serie','Inventario','Marca','Modelo','Ubicación','Procesador','RAM (GB)','Tipo almacenamiento','Capacidad (GB)','Sistema operativo','Arquitectura','Estado','Observaciones','Registro','Actualización'], ...items.map(e => [e.code,e.name,e.serial,e.inventory,e.brand,e.model,e.location,e.processor,e.ram,e.storage_type,e.storage_gb,e.os,e.architecture,e.status,e.observations,e.created_at,e.updated_at])].map(row => row.map(escape).join(',')).join('\r\n'); }
+export function exportCSV(items: Equipment[]) { const url = URL.createObjectURL(new Blob([csvContent(items)], { type: 'text/csv;charset=utf-8;' })); const a = document.createElement('a'); a.href = url; a.download = 'techcontrol-equipos.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }

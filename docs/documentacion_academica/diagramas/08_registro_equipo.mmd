@@ -1,0 +1,25 @@
+sequenceDiagram
+ actor Administrador
+ participant UI as EquipmentForm
+ participant Zod
+ participant API as Express
+ participant Store
+ participant DB as SQLite
+ Administrador->>UI: Completa ficha real
+ UI->>Zod: equipmentSchema.safeParse
+ alt Inválida
+  Zod-->>UI: Errores por campo
+ else Válida
+  UI->>API: POST /api/equipment
+  API->>Store: save(usuario,null,data,reason)
+  Store->>Store: Verifica rol y esquema estricto
+  Store->>DB: BEGIN IMMEDIATE
+  Store->>DB: Incrementa contador, INSERT equipo
+  DB->>DB: CHECK, índices únicos y trigger capacidad
+  Store->>DB: INSERT historial inicial y COMMIT
+  API-->>UI: 201 + equipo
+  UI->>API: Recarga inventario
+  UI-->>Administrador: Confirmación y navegación a ficha
+ end
+ Note over Store,DB: Cualquier fallo dentro de transacción provoca ROLLBACK
+

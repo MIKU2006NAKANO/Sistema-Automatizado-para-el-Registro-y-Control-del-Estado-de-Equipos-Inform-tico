@@ -1,0 +1,22 @@
+flowchart TB
+ App[App.tsx: sesión, navegación, inventario] --> Login[Login.tsx]
+ App --> Views[Dashboard / EquipmentForm / EquipmentList / Details]
+ App --> Users[Users.tsx]
+ App --> Reports[Reports / LaboratorySummary]
+ Reports --> Controls[ReportControls.tsx]
+ Controls --> Filter[reportFilters.ts]
+ Controls --> Export[reports.ts / excel.ts]
+ App --> API[lib/api.ts]
+ Users --> API
+ Views --> API
+ Views --> Domain[domain.ts: tipos, Zod, filtros]
+ API --> Routes[server/app.mjs]
+ Index[server/index.mjs] --> Routes
+ Index --> Store[server/store.mjs]
+ Index --> Lock[lock.mjs]
+ Routes --> Store
+ Store --> Domain
+ Store --> DB[(SQLite)]
+ Store --> Migrations[migrations 001 y 002]
+ Sup[supervision.mjs y supervision-store.mjs] -. deshabilitado en inicio normal .-> DB
+

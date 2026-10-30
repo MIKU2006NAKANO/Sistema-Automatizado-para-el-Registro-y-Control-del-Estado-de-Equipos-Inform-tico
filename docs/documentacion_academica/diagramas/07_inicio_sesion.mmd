@@ -1,0 +1,21 @@
+sequenceDiagram
+ actor Usuario
+ participant UI as Login React
+ participant API as Express
+ participant Auth as Store
+ participant DB as SQLite
+ Usuario->>UI: Envía identificador y contraseña
+ UI->>API: POST /api/auth/login
+ API->>API: Valida Zod, origen y frecuencia
+ API->>Auth: login(email,password)
+ Auth->>DB: SELECT usuario por identificador
+ DB-->>Auth: Registro y hash
+ Auth->>Auth: scrypt + comparación segura
+ alt Credenciales correctas
+  Auth->>DB: INSERT sesión con hash y vencimiento
+  API-->>UI: Perfil + cookie HttpOnly
+  UI->>API: GET /api/auth/session y /api/equipment
+ else Incorrectas
+  API-->>UI: 401, mensaje
+ end
+

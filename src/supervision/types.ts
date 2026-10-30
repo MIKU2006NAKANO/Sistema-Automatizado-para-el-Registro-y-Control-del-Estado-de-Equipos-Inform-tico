@@ -1,0 +1,6 @@
+export type ScreenRow={id:string;code:string;name:string;connected:boolean;sharing:boolean;phase:'idle'|'requested'|'accepted'|'sharing';session_id:string|null;owned:boolean};
+export type Device={id:string;equipment_id:string;code:string;name:string;expires_at:number};
+export type ScreenRequest={type:'request';session_id:string;administrator:string;code:string;expires_at:number};
+export type Signal={type:'signal';session_id:string;equipment_id?:string;sdp?:RTCSessionDescriptionInit;candidate?:RTCIceCandidateInit};
+export type ScreenMessage=ScreenRequest|Signal|{type:'snapshot';equipment:ScreenRow[]}|{type:'ended';session_id:string;reason:string}|{type:'error';message:string}|{type:'hello';connection_id:string}|{type:'heartbeat'};
+export async function screenRequest<T>(path:string,body?:unknown):Promise<T>{const response=await fetch('/api/supervision'+path,{method:body===undefined?'GET':'POST',credentials:'same-origin',cache:'no-store',headers:{'X-TechControl':'local',...(body===undefined?{}:{'Content-Type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body)});const data=await response.json();if(!response.ok)throw new Error(data.message||'No se pudo conectar con Supervisión.');return data as T;}

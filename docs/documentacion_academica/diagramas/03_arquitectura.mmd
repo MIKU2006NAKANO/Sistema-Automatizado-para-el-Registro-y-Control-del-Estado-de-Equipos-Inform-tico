@@ -1,0 +1,12 @@
+flowchart LR
+ Persona[Administrador o técnico] --> Browser[Navegador]
+ subgraph PC[Computadora local]
+ Browser --> React[React + Router + CSS]
+ React -->|HTTP JSON /api y cookie| Express[Express]
+ Express --> Store[createStore / node:sqlite]
+ Store --> SQLite[(SQLite + WAL)]
+ Express -->|sirve dist| Browser
+ React -->|importación dinámica| Export[PDF / XLSX en navegador]
+ Store --> Backup[Respaldos locales]
+ end
+

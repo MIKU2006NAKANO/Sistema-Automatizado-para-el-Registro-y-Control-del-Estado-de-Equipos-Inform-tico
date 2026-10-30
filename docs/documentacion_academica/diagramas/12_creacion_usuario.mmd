@@ -1,0 +1,22 @@
+sequenceDiagram
+ actor Administrador
+ participant UI as Users.tsx
+ participant API as Express
+ participant Store
+ participant DB as SQLite
+ Administrador->>UI: Nombre, identificador y contraseña
+ UI->>UI: Validación HTML
+ UI->>API: POST /api/users con rol técnico
+ API->>API: Autentica y exige administrador
+ API->>Store: createUser
+ Store->>Store: accountSchema y hash scrypt
+ Store->>DB: BEGIN IMMEDIATE, revalida actor e INSERT
+ alt Identificador duplicado o inválido
+  API-->>UI: Error 409 o 400
+ else Correcto
+  Store->>DB: COMMIT
+  API-->>UI: 201 perfil
+  UI->>API: GET /api/users
+  UI-->>Administrador: Lista actualizada y confirmación
+ end
+
